@@ -3,7 +3,7 @@ Will generate a MarkDown file containing the given script's documentation, based
 
 [MDGenerator.md](MDGenerator.md) was generated using the script.
 
-## Syntax
+You can pipe scripts into the function:
 ```ps
-MDGenerator.ps1 [[-Script] <FileInfo>] [<CommonParameters>]
+Get-ChildItem -Filter *.ps1 | Write-MDDocumentation
 ```
