@@ -1,21 +1,28 @@
 [cmdletbinding()]
 param(
     [ValidateScript({
-        if( -Not ($_ | Test-Path) ){
+        if( -Not ($_ | Test-Path -Filter *.ps1) ){
             throw 'File does not exist'
         }
         return $true
     })]
-    [System.IO.FileInfo]$Script
+    [String]$Script,    
+    [ValidateScript({
+        if( -Not ($_ | Test-Path -Filter *.md) ){
+            throw 'File does not exist'
+        }
+        return $true
+    })]
+    [String]$Append
 )
 
 Write-Verbose "Recovering help description for the script."
 $HelpContent = Get-Help $Script -Full
-
+$ScriptName = [String]$Script.Split('\')[-1]
 $FileName = $HelpContent.Name.Replace('.ps1','.md')
 Write-Verbose "Creating file: $FileName"
 
-"# $($FileName.Split('\')[-1])" | Out-File -FilePath $FileName
+"# $ScriptName" | Out-File -FilePath $FileName
 
 if($HelpContent.Synopsis){
     Write-Verbose "Adding Synopsis..."
@@ -23,8 +30,15 @@ if($HelpContent.Synopsis){
 }
 
 Write-Verbose "Adding Syntax..."
-$Syntax = ($HelpContent.syntax | Out-String).Trim().Split('\')[-1]
-"",'## Syntax','```',$Syntax,'```' | Add-Content -Path $FileName
+# $Syntax = ($HelpContent.syntax | Out-String).Trim().Split('\') | Where-Object{$_ -match $FileName}
+$Syntax = (($HelpContent.syntax | Out-String) -Replace '[A-Z]?:?\\.+\\',';').Split(';').Trim()
+"",'## Syntax'| Add-Content -Path $FileName
+foreach($CodeBlock in $Syntax){
+    if($CodeBlock -eq ''){
+        Continue
+    }
+    '```',"$CodeBlock",'```'| Add-Content -Path $FileName
+}
 
 if($HelpContent.description.Text){
     Write-Verbose "Adding Description..."
@@ -61,7 +75,7 @@ if($HelpContent.returnValue){
 }
 
 if($HelpContent.relatedLinks){
-    Write-Verbose "Adding Links"
+    Write-Verbose "Adding Links..."
     "",'## Related Links' | Add-Content -Path $FileName
     $Links = $HelpContent.relatedLinks.navigationLink.linkText
     foreach($Link in $Links){
@@ -74,7 +88,14 @@ if($HelpContent.relatedLinks){
     }
 }
 
-Write-Verbose "Done generating file: $FileName"
+if(-not $Append){
+    Write-Verbose "Done generating file: $FileName"
+}else{
+    $MD = Get-Content -Path $FileName
+    "" | Add-Content -Path $Append
+    $MD | ForEach-Object{$_.Replace('# ','## ') | Add-Content -Path $Append}
+    Write-Verbose "Content added to: $Append"
+}
 
 <#
     .SYNOPSIS
@@ -85,6 +106,9 @@ Write-Verbose "Done generating file: $FileName"
 
     .PARAMETER Script
     Path to the script for which you want to generate the file.
+
+    .PARAMETER Append
+    Existing MD file you want to append the generated report to.
 
     .INPUTS
     None.
