@@ -58,7 +58,7 @@ function Write-MDDocumentation{
             $Examples = $HelpContent.examples.example
             $Count = 1
             foreach($Example in $Examples){
-                "","### Example $Count",'```ps',$Example.code,'```' | Add-Content -Path $FileName
+                "","### Example $Count","",'```ps',$Example.code,'```' | Add-Content -Path $FileName
             }
         }
 
