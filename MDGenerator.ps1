@@ -38,7 +38,6 @@ function Write-MDDocumentation{
         }
 
         Write-Verbose "Adding Syntax..."
-        # $Syntax = ($HelpContent.syntax | Out-String).Trim().Split('\') | Where-Object{$_ -match $FileName}
         $Syntax = (($HelpContent.syntax | Out-String) -Replace '[A-Z]?:?\\.+\\',';').Split(';').Trim()
         "",'## Syntax',"" | Add-Content -Path $FileName
         foreach($CodeBlock in $Syntax){
@@ -89,7 +88,9 @@ function Write-MDDocumentation{
             foreach($Link in $Links){
                 try{
                     $Url = (Get-Help $Link -ErrorAction Stop).relatedLinks.navigationLink.uri | Where-Object{$_ -ne $null}
-                    if($Url){
+                    if($URL.Count -gt 1){
+                        "* [$Link]($($Url[0])" | Add-Content -Path $FileName
+                    }elseif($Url){
                         "* [$Link]($Url)" | Add-Content -Path $FileName
                     }else{
                         "* $Link" | Add-Content -Path $FileName
