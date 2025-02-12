@@ -20,7 +20,16 @@ function Write-MDDocumentation{
             }
             return $true
         })]
-        [String]$Append
+        [Parameter(
+            ParameterSetName='Append',
+            HelpMessage='Existing MD file you want to append the generated report to.'
+        )]
+        [String]$Append,
+        [Parameter(
+            ParameterSetName='Append',
+            HelpMessage='Keep the original MD file.'
+        )]
+        [Bool]$KeepOriginal
     )
     
     process{
@@ -67,7 +76,7 @@ function Write-MDDocumentation{
             "",'## Parameters' | Add-Content -Path $FileName
             $Parameters = $HelpContent.parameters.parameter
             foreach($Parameter in $Parameters){
-                "","### -$($Parameter.Name)","",$Parameter.Description.Text,'```',"Type: $($Parameter.type.Name)",'Parameter Sets: (All)',"","Required: $($Parameter.required)","Position: $($Parameter.Position)","Default value: $(if($Parameter.defaultValue){$Parameter.defaultValue}else{"None"})","Accept pipeline: $($Parameter.pipelineInput)","Accept wildcard characters: $($Parameter.globbing)",'```' | Add-Content -Path $FileName
+                "","### -$($Parameter.Name)","",$Parameter.Description.Text,'','```',"Type: $($Parameter.type.Name)",'Parameter Sets: (All)',"","Required: $($Parameter.required)","Position: $($Parameter.Position)","Default value: $(if($Parameter.defaultValue){$Parameter.defaultValue}else{"None"})","Accept pipeline: $($Parameter.pipelineInput)","Accept wildcard characters: $($Parameter.globbing)",'```' | Add-Content -Path $FileName
             }
         }
 
@@ -108,6 +117,10 @@ function Write-MDDocumentation{
             '','---','' | Add-Content -Path $Append
             $MD | ForEach-Object{$_.Replace('# ','## ') | Add-Content -Path $Append}
             Write-Verbose "Content added to: $Append"
+            if(!$KeepOriginal){
+                Remove-Item -Path $FileName
+                Write-Verbose "File removed: $FileName"
+            }
         }
     }
 
