@@ -98,11 +98,11 @@ function Write-MDDocumentation{
                 try{
                     $Url = (Get-Help $Link -ErrorAction Stop).relatedLinks.navigationLink.uri | Where-Object{$_ -ne $null}
                     if($URL.Count -gt 1){
-                        "* [$Link]($($Url[0])" | Add-Content -Path $FileName
+                        "- [$Link]($($Url[0]))","" | Add-Content -Path $FileName
                     }elseif($Url){
-                        "* [$Link]($Url)" | Add-Content -Path $FileName
+                        "- [$Link]($Url)","" | Add-Content -Path $FileName
                     }else{
-                        "* $Link" | Add-Content -Path $FileName
+                        "- $Link","" | Add-Content -Path $FileName
                     }
                 }catch{
                     continue
