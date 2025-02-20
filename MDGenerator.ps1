@@ -76,7 +76,7 @@ function Write-MDDocumentation{
             "",'## Parameters' | Add-Content -Path $FileName
             $Parameters = $HelpContent.parameters.parameter
             foreach($Parameter in $Parameters){
-                "","### -$($Parameter.Name)","",$Parameter.Description.Text,'','```',"Type: $($Parameter.type.Name)",'Parameter Sets: (All)',"","Required: $($Parameter.required)","Position: $($Parameter.Position)","Default value: $(if($Parameter.defaultValue){$Parameter.defaultValue}else{"None"})","Accept pipeline: $($Parameter.pipelineInput)","Accept wildcard characters: $($Parameter.globbing)",'```' | Add-Content -Path $FileName
+                "","### -$($Parameter.Name)","",$Parameter.Description.Text,'','```TXT',"Type: $($Parameter.type.Name)",'Parameter Sets: (All)',"","Required: $($Parameter.required)","Position: $($Parameter.Position)","Default value: $(if($Parameter.defaultValue){$Parameter.defaultValue}else{"None"})","Accept pipeline: $($Parameter.pipelineInput)","Accept wildcard characters: $($Parameter.globbing)",'```' | Add-Content -Path $FileName
             }
         }
 
