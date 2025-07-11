@@ -16,7 +16,7 @@ function Write-MDDocumentation{
         [String]$Script,    
         [ValidateScript({
             if( -Not ($_ | Test-Path -Filter *.md) ){
-                throw 'File does not exist'
+                throw 'Invalid file.'
             }
             return $true
         })]
@@ -53,7 +53,7 @@ function Write-MDDocumentation{
             if($CodeBlock -eq ''){
                 Continue
             }
-            '```',"$CodeBlock",'```'| Add-Content -Path $FileName
+            '```TXT',"$CodeBlock",'```'| Add-Content -Path $FileName
         }
 
         if($HelpContent.description.Text){
@@ -76,7 +76,7 @@ function Write-MDDocumentation{
             "",'## Parameters' | Add-Content -Path $FileName
             $Parameters = $HelpContent.parameters.parameter
             foreach($Parameter in $Parameters){
-                "","### -$($Parameter.Name)","",$Parameter.Description.Text,'','```TXT',"Type: $($Parameter.type.Name)",'Parameter Sets: (All)',"","Required: $($Parameter.required)","Position: $($Parameter.Position)","Default value: $(if($Parameter.defaultValue){$Parameter.defaultValue}else{"None"})","Accept pipeline: $($Parameter.pipelineInput)","Accept wildcard characters: $($Parameter.globbing)",'```' | Add-Content -Path $FileName
+                "","### -$($Parameter.Name)","",$Parameter.Description.Text,'','```TXT',"Type: $($Parameter.type.Name)","","Required: $($Parameter.required)","Position: $($Parameter.Position)","Default value: $(if($Parameter.defaultValue){$Parameter.defaultValue}else{"None"})","Accept pipeline: $($Parameter.pipelineInput)","Accept wildcard characters: $($Parameter.globbing)",'```' | Add-Content -Path $FileName
             }
         }
 
